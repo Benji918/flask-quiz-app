@@ -8,10 +8,9 @@ Table of contents
 2. [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
     - [Installation](#installation)
-3. [Usage](#usage)
-4. [Contributing](#contributing)
-5. [License](#license)
-6. [Contact](#contact)
+
+3. [Contributing](#contributing)
+
 
 ## About the Project
 
