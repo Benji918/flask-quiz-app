@@ -1,0 +1,42 @@
+
+{% extends 'base.html' %}
+
+
+{% block content %}
+    <div class="ques-div">
+       <form method="POST" action="{{url_for('question')}}">
+            <h2 class="qnum">Question</h2>
+            <div class="dotted-spaced"></div>
+            <hr>
+           {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul>
+                      {% for category, message in messages %}
+                       <li style="color: {{ category }};">
+                              <strong>{{ message }}</strong>
+                          </li>
+                      {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+           {% if questions %}
+               <h1 class="ques-heading">{{questions}}</h1>
+                <div class="options-div">
+                     {{ form.csrf_token }}
+                    {{ form.options(class="list-unstyled") }}
+                </div>
+               {{ form.check(class="btn btn-primary btn-lg ") }} {{ form.submit(class="btn btn-primary btn-lg ") }}
+           {% else %}
+                <h1 class="ques-heading">Questions finished!</h1>
+                <h3 class="congrats-cls">Check your score</h3>
+               <a href="{{url_for('score')}}" class="btn btn-primary btn-lg">Score</a>
+            {% endif %}
+
+        </form>
+        <!-- <span class="check-circle">
+            <i class="fas fa-check-circle"></i>
+        </span> -->
+    </div>
+
+{% endblock %}
+
