@@ -2,9 +2,6 @@
 
 A Fully responsive Quiz built using Python's Flask
 
- - [Report  Bug](https://github.com/thepasterover/flask-quiz-app/issues)
- - [Request Feature](https://github.com/thepasterover/flask-quiz-app/issues)
-
 Table of contents
 1. [About the project](#about-the-project)
     - [Built With](#built-with)
@@ -28,18 +25,13 @@ This project is a fully responsive Quiz App built using Python's Flask for the b
 
 Features:
 - Login and Register to give a test
-- Option to retake a test
 - View Your scores immediately
-- View the highest score by your peers
-- Add Work done by an employee for today
 - Uses SQLite for faster performance
 
 Known Bugs:
 - Nothing so far!
 
-Future Scope:
-- Build a entire site for the test taker to arrange question and marks respectively.
-- Dynamic Highest Score visibilit
+
 
 ## Built With
 - [Python](https://www.python.org/)
@@ -78,10 +70,6 @@ $ npm run generate
 ```
 
 
-## Usage
-
-This project can be setup and used by small to medium sized schools and classes.
-
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are greatly appreciated.
@@ -92,12 +80,5 @@ Contributions are what make the open source community such an amazing place to b
 4. Push to the Branch (git push origin feature/AmazingFeature)
 5. Open a Pull Request
 
-## License
-Distributed under the MIT License. See LICENSE for more information.
-
-## Contact
-
-Name: Boobalan Shettiyar - boopalanshettiyar78@gmail.com
-ProjectLink: https://github.com/thepasterover/flask-quiz-app
 
 
