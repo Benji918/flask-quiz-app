@@ -54,8 +54,6 @@ $ git clone https://github.com/thepasterover/flask-quiz-app.git
 # go to the directory
 $ cd flask-quiz-app
 
-# use virtual env if you want
-$ virtualenv ENV && source ENV/bin/activate
 
 # generate static project
 $ pip install -r requirements.txt
@@ -64,8 +62,6 @@ $ pip install -r requirements.txt
 $ set FLASK_APP=main.py
 $ flask run
 
-# generate static project
-$ npm run generate
 ```
 
 
