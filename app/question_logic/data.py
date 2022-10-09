@@ -3,8 +3,6 @@ import requests
 parameters = {
     'amount': 10,
     'type': 'boolean',
-    'category': 18,
-    'difficulty': 'medium'
 }
 
 
@@ -15,7 +13,7 @@ def get_data():
     return question_data
 
 
-print(get_data())
+# print(get_data())
 
 # question_data = [
 #     {

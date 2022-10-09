@@ -21,10 +21,11 @@
     <nav>
         <ul class="nav-links">
             <li> <a href="{{ url_for('home') }}"> Home </a> </li>
-            {% if not g.user %}
+            {% if not current_user.is_authenticated %}
             <li> <a href="{{ url_for('login') }}"> Login </a> </li>
             {% else %}
             <li> <a href="{{ url_for('logout') }}"> Logout </a> </li>
+            <li> <a href="#"> {{current_user.username}} </a> </li>
             {% endif %}
         </ul>
     </nav>

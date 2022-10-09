@@ -6,6 +6,7 @@
     <div class="ques-div">
        <form method="POST" action="{{url_for('question')}}">
             <h2 class="qnum">Question</h2>
+            <h2 class="qnum">Score:{{score}}</h2>
             <div class="dotted-spaced"></div>
             <hr>
            {% with messages = get_flashed_messages(with_categories=true) %}

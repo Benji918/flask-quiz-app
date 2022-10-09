@@ -8,6 +8,17 @@
                     <h1>Login to  <br> Quiz Buzz!</h1>
                     <p>Create any type of test, from easy <br> to complex.</p>
                 </div>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul>
+                      {% for category, message in messages %}
+                       <li style="color: {{ category }};">
+                              <strong>{{ message }}</strong>
+                          </li>
+                      {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
                 {{ form.hidden_tag() }}
                 <div class="form-para">
                     <svg width="30px" height="30px" viewBox="0 0 16 16" class="bi bi-person" fill="currentColor" xmlns="http://www.w3.org/2000/svg">

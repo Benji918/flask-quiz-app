@@ -1,7 +1,6 @@
 from app import app
 from flask import render_template, request, redirect, url_for, session, g, flash
 from flask_login import login_required, current_user, login_user, logout_user, LoginManager
-from werkzeug.urls import url_parse
 from app.forms import LoginForm, RegistrationForm, QuestionForm
 from app.models import User
 from app import db
@@ -31,7 +30,7 @@ for question in get_data:
 
 quiz = quiz_brain.QuizBrain(question_bank)
 quiz_interface = ui.Quizinterface(quiz)
-
+print(quiz.score)
 
 @app.route('/')
 def home():
@@ -44,82 +43,74 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
+            flash(message='Incorrect credentials', category='red')
             return redirect(url_for('login'))
         # session['user_id'] = user.id
         session['marks'] = 0
         login_user(user, remember=True)
-        next_page = request.args.get('next')
-        if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('home')
-            return redirect(next_page)
         return redirect(url_for('home'))
-    # if g.user:
-    #     return redirect(url_for('home'))
     return render_template('login.html', form=form, title='Login')
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
-    if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.password.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        session['user_id'] = user.id
-        session['marks'] = 0
-        return redirect(url_for('home'))
-    # if g.user:
-    #     return redirect(url_for('home'))
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            user = User(username=form.username.data, email=form.email.data, marks=0)
+            user.set_password(form.password.data)
+            db.session.add(user)
+            db.session.commit()
+            return redirect(url_for('home'))
     return render_template('register.html', title='Register', form=form)
 
 
 @app.route('/question', methods=['GET', 'POST'])
+@login_required
 def question():
     form = QuestionForm()
     form.options.choices = ['True', 'False']
     questions = quiz_interface.get_question()
     if form.validate_on_submit():
         if request.method == 'POST':
-            if quiz.still_has_questions():
+            if questions:
                 option = request.form['options']
                 if option == 'True':
                     if quiz_interface.anwser_true() == 'green':
                         print(quiz_interface.anwser_true())
-                        flash(message='Correct!', category='green')
-                        return redirect(url_for('question'))
+                        print(quiz.score)
                     else:
                         print(quiz_interface.anwser_true())
-                        flash(message='Wrong!', category='red')
-                        return redirect(url_for('question'))
-                else:
+                        print(quiz.score)
+                elif option == 'False':
                     if quiz_interface.anwser_false() == 'green':
                         print(quiz_interface.anwser_false())
-                        flash(message='Correct!', category='green')
-                        return redirect(url_for('question'))
+                        print(quiz.score)
                     else:
                         print(quiz_interface.anwser_false())
-                        flash(message='Wrong!', category='red')
-                        return redirect(url_for('question'))
+                        print(quiz.score)
             else:
-                return render_template('score.html')
-    return render_template('question.html', form=form, questions=questions)
+                return redirect(url_for('score'))
+    return render_template('question.html', form=form, questions=questions, score=quiz.score)
 
 
 @app.route('/score')
 def score():
-    # if not g.user:
-    #     return redirect(url_for('login'))
-    # g.user.marks = session['marks']
-    # db.session.commit()
-    return render_template('score.html')
+    score = quiz.score
+    return render_template('score.html', score=score)
+
+
+@app.route('/reset')
+def reset():
+    quiz_interface.refresh()
+    return redirect(url_for('question'))
 
 
 @app.route('/logout')
 @login_required
 def logout():
-    if not g.user:
-        return redirect(url_for('login'))
+    # if not g.user:
+    #     return redirect(url_for('login'))
     session.pop('user_id', None)
     session.pop('marks', None)
     logout_user()

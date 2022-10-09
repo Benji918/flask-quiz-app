@@ -40,10 +40,7 @@ class Quizinterface:
             return self.color
 
     def refresh(self):
-        # self.true_btn.config(state=ACTIVE)
-        # self.false_btn.config(state=ACTIVE)
-        # self.refresh_btn.config(state=DISABLED)
         self.quiz.reset()
         # self.score.config(text=f'Score:{self.quiz.score}')
-        q_text = self.quiz.next_question()
+        # q_text = self.quiz.next_question()
         # self.canvas.itemconfig(self.question_text, text=q_text)
