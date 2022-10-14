@@ -1,6 +1,17 @@
 {% extends 'base.html' %}
 
 {% block content %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <ul>
+                      {% for category, message in messages %}
+                       <li style="color: {{ category }};">
+                              <strong>{{ message }}</strong>
+                          </li>
+                      {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
     <div class="home-div">
         <img src="{{ url_for('static', filename='images/home.jpg') }}" class="home-img">
         <div class="info-div">
@@ -12,7 +23,11 @@
             <h4> Explore the Test Preparation 
                 exclusively made for you!
             </h4>
+            {% if questions %}
             <a href="{{ url_for('question')}}">Take the test</a>
+            {%else %}
+            <a href="{{ url_for('score')}}">Take the test</a>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

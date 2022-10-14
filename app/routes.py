@@ -1,9 +1,14 @@
+import datetime
+
 from app import app
 from flask import render_template, request, redirect, url_for, session, g, flash
 from flask_login import login_required, current_user, login_user, logout_user, LoginManager
 from app.forms import LoginForm, RegistrationForm, QuestionForm
 from app.models import User
 from app import db
+from app.token import generate_confirmation_token, confirm_token
+from app.email import send_email
+from app.decorator import check_confirmed
 from app.question_logic import question_model
 from app.question_logic import data
 from app.question_logic import quiz_brain
@@ -32,9 +37,11 @@ quiz = quiz_brain.QuizBrain(question_bank)
 quiz_interface = ui.Quizinterface(quiz)
 print(quiz.score)
 
+
 @app.route('/')
 def home():
-    return render_template('index.html', title='Home')
+    questions = quiz_interface.get_question()
+    return render_template('index.html', title='Home', questions=questions)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -57,16 +64,76 @@ def register():
     form = RegistrationForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            user = User(username=form.username.data, email=form.email.data, marks=0)
+            # Verifying the user does not exist
+            old_user = User.query.filter_by(email=form.email.data).first()
+            if old_user:
+                flash(message='User already exists, login instead!')
+                return redirect(url_for('login'))
+            user = User(username=form.username.data,
+                        email=form.email.data,
+                        marks=0,
+                        registered_on=datetime.datetime.now(),
+                        confirmed=False
+                        )
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()
-            return redirect(url_for('home'))
+            token = generate_confirmation_token(user.email)
+            print(token)
+            confirm_url = url_for('confirm_email', token=token, email=form.email.data, _external=True)
+            subject = "Please confirm your email"
+            send_email(to=user.email, subject=subject, confirm_url=confirm_url)
+
+            login_user(user)
+
+            # flash('A confirmation email has been sent via email.', 'red')
+            return redirect(url_for("unconfirmed"))
+
     return render_template('register.html', title='Register', form=form)
+
+
+@app.route('/confirm/<token>')
+@login_required
+def confirm_email(token):
+    try:
+        email = confirm_token(token)
+    except:
+        flash('The confirmation link is invalid or has expired.', 'red')
+    user_email = request.args.get('email')
+    user = User.query.filter_by(email=user_email).first_or_404()
+    if user.confirmed:
+        flash('Account already confirmed. Please login.', 'green')
+    else:
+        user.confirmed = True
+        user.confirmed_on = datetime.datetime.now()
+        db.session.add(user)
+        db.session.commit()
+        flash('You have confirmed your account. Thanks!', 'green')
+    return redirect(url_for('home'))
+
+
+@app.route('/unconfirmed')
+@login_required
+def unconfirmed():
+    if current_user.confirmed:
+        return redirect('home')
+    flash('Please confirm your account!', 'error')
+    return render_template('unconfirmed.html')
+
+@app.route('/resend')
+@login_required
+def resend_confirmation():
+    token = generate_confirmation_token(current_user.email)
+    confirm_url = url_for('confirm_email', token=token, _external=True)
+    subject = "Please confirm your email"
+    send_email(to=current_user.email, subject=subject, confirm_url=confirm_url)
+    flash('A new confirmation email has been sent.', 'green')
+    return redirect(url_for('unconfirmed'))
 
 
 @app.route('/question', methods=['GET', 'POST'])
 @login_required
+@check_confirmed
 def question():
     form = QuestionForm()
     form.options.choices = ['True', 'False']
